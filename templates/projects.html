@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/7.css" />
+    <!--
+    Thanks to 7.css, amazing!
+    https://khang-nd.github.io/7.css/
+    -->
+    <title>mesna.cz</title>
+    <style>
+      a {
+        color: black;
+      }
+      a:hover {
+        color: black;
+        text-decoration-line: none;
+      }
+      .ccss {
+        color: blue;
+      }
+      .ccss:hover {
+        text-decoration-line: underline;
+        color: blue;
+      }
+      .abcd {
+        max-width: 100%;
+        min-height: 90%;
+      }
+      body {
+        font:
+          9pt "Segoe UI",
+          "SegoeUI",
+          "Noto Sans",
+          sans-serif;
+      }
+      .inln{
+        max-height=1%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="window active abcd"></div>
+    <div class="title-bar">
+      <div class="title-bar-text">mesna.cz - Internet explorer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Restore"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body has-space">
+      <section class="tabs">
+        <menu role="tablist" aria-label="Tabs Template">
+          <a href="/"><button role="tab" aria-controls="tab-A">Home</button></a>
+          <button
+            role="tab"
+            aria-controls="tab-B"
+            aria-selected="true"
+            href="/projects"
+          >
+            Projects
+          </button>
+          <a href="/links">
+            <button role="tab" aria-controls="tab-C" href="/links">
+              Links
+            </button></a
+          >
+          <a href="/guestbook">
+            <button role="tab" aria-controls="tab-D" href="/guestbook">
+              Guestbook
+            </button></a
+          >
+          <button role="tab" aria-controls="tab-E" disabled>
+            Chatroom (in progress)
+          </button>
+        </menu>
+      </section>
+      <p>Project stuffs!!!</p>
+      <br />
+      <img src="http://www.deadnet.se/88x31/2001.gif" />
+      <a href="https://github.com/IShouldTestMyCode/hrt-cafe-archive"
+        ><img src="https://88x31.kate.pet/hrtcafe.gif" height="31" /></a
+      ><a href="https://pillowfort.social/posts/1632320"
+        ><img src="https://88x31.kate.pet/flag-demigirl.png" height="31" /></a
+      ><img src="https://88x31.kate.pet/pronouns_sheher.gif" height="31" /><a
+        href="https://otherkin.fandom.com/wiki/Therians"
+        ><img src="https://88x31.kate.pet/therian.png" height="31"
+      /></a>
+      <img src="https://88x31.kate.pet/madeon_linux.gif" height="31" />
+      <a href="https://en.wikipedia.org/wiki/Source_(game_engine)"
+        ><img
+          src="https://88x31.kate.pet/source-poweredby-orange.png"
+          height="31" /></a
+      ><img src="https://88x31.kate.pet/console_wii.png" height="31" /><img
+        src="https://88x31.kate.pet/glados.gif"
+        height="31"
+      /><img src="https://88x31.kate.pet/hl.gif" height="31" /><img
+        src="https://88x31.kate.pet/portal_alt.jpg"
+        height="31"
+      /><a href="https://transistorcafe.net/~voltbun/artwork.html"
+        ><img src="https://88x31.kate.pet/xeniatrans_now.gif" height="31" /></a
+      ><img src="https://88x31.kate.pet/cc-button.gif" height="31" />
+      <img src="https://88x31.kate.pet/transrats.gif" height="31" /><img
+        src="https://88x31.kate.pet/nowar.png"
+        height="31"
+      /><img src="https://88x31.kate.pet/w7-boot.gif" height="31" /><a
+        href="https://yesterweb.org/no-to-web3/"
+        ><img src="https://88x31.kate.pet/noweb3.gif" height="31"
+      /></a>
+      <img src="https://88x31.kate.pet/piracy.png" height="31" /><img
+        src="https://88x31.kate.pet/neko.gif"
+        height="31"
+      /><img
+        src="https://88x31.kate.pet/machine_kills_fascists.jpg"
+        height="31"
+      />
+      <img src="https://88x31.kate.pet/girlsnow.png" height="31" /><img
+        src="https://88x31.kate.pet/gamecube.png"
+        height="31"
+      />
+      <a href="https://88x31.kate.pet/"
+        ><img
+          src="https://88x31.kate.pet/0_88x31.kate.pet.png"
+          height="31" /></a
+      ><img
+        src="https://88x31.kate.pet/8831trans_nyannyanmachine.png"
+        height="31"
+      />
+    </div>
+    <div class="status-bar">
+      <p class="status-bar-field">{{curryear}} - Huewhg</p>
+      <p class="status-bar-field">{{year}}</p>
+      <p class="status-bar-field">
+        Made with
+        <a class="ccss" href="https://khang-nd.github.io/7.css/">7.css</a>
+      </p>
+      <p class="status-bar-field">
+        CPU Usage: {{cpu}}%
+        <!--<div
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="80"
+        >
+          <div style="width: {{cpu}}%"></div>
+        </div>-->
+      </p>
+    </div>
+  </body>
+</html>
