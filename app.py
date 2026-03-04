@@ -8,6 +8,7 @@ from flask import (
     url_for,
     flash,
 )
+import os
 import psutil
 from datetime import datetime
 import time
@@ -62,4 +63,10 @@ def projects():
     )
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5001, debug=False)
+    try:
+        port = int(os.environ.get("PORT", 5000))  # Render injects PORT env var
+        print("render")
+        app.run(host="0.0.0.0", port=port)
+    except:
+        print("local")
+        app.run(host="127.0.0.1", port=5001, debug=False)
