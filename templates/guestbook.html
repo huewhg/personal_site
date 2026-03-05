@@ -44,7 +44,7 @@
     </style>
   </head>
   <body>
-    <div class="window active abcd"></div>
+    <div class="window active abcd" style="max-width: fit-content"></div>
     <div class="title-bar">
       <div class="title-bar-text">mesna.cz - Internet explorer</div>
       <div class="title-bar-controls">
@@ -56,7 +56,7 @@
     <div class="window-body has-space">
       <section class="tabs">
         <menu role="tablist" aria-label="Tabs Template">
-          <button role="tab" aria-controls="tab-A">Home</button>
+          <a href="/"><button role="tab" aria-controls="tab-A">Home</button></a>
           <a href="/projects"
             ><button role="tab" aria-controls="tab-B" href="/projects">
               Projects
@@ -86,7 +86,7 @@
       <div>
         <div class="window active" style="max-width: 300px">
           <div class="title-bar">
-            <div class="title-bar-text">Add to Guestbook!</div>
+            <div class="title-bar-text">Sign my Guestbook!</div>
             <div class="title-bar-controls">
               <button aria-label="Minimize"></button>
               <button aria-label="Maximize"></button>
@@ -102,6 +102,7 @@
                 name="name"
                 style="margin-right: 3%"
               />
+              <br />
               <label for="site">Site/Contact:</label>
               <input
                 id="site"
@@ -139,7 +140,7 @@
         {% for s in sigs %}
         <div
           class="window active"
-          style="max-width: fit-content"
+          style="max-width: 500px; width: fit-content"
           class="center"
         >
           <div class="title-bar">
@@ -186,7 +187,7 @@
     </div>
     <div>
       <br />
-      <img src="http://www.deadnet.se/88x31/2001.gif" />
+
       <a href="https://github.com/IShouldTestMyCode/hrt-cafe-archive"
         ><img src="https://88x31.kate.pet/hrtcafe.gif" height="31" /></a
       ><a href="https://pillowfort.social/posts/1632320"

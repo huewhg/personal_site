@@ -59,6 +59,7 @@ def get_guestbook() -> list[signature]:
         )
 
     file.close()
+    sigs.reverse()
     return sigs
 
 
