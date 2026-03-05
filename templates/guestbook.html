@@ -173,9 +173,9 @@
                 </tr>
               </tbody>
             </table>
-            <p>{{ s.contents | replace('\n', '<br>') | safe }}</p>
+            <p>{{ s.contents | replace('\n', '<br />') | safe }}</p>
             {% if s.image != ""%}
-            <img src="{{s.image}}" />
+            <img style="max-width: 400px" src="{{s.image}}" />
             {% endif %}
           </div>
         </div>
