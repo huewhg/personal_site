@@ -10,39 +10,36 @@
     -->
     <title>mesna.cz</title>
     <style>
-            a {
-              color: black;
-            }
-            a:hover {
-              color: black;
-              text-decoration-line: none;
-            }
-            .ccss {
-              color: blue;
-            }
-            .ccss:hover {
-              text-decoration-line: underline;
-              color: blue;
-            }
-            .abcd {
-              max-width: 100%;
-              min-height: 90%;
-            }
-            body {
-              font:
-                9pt "Segoe UI",
-                "SegoeUI",
-                "Noto Sans",
-                sans-serif;
-            }
-            .inln{
-              max-height=1%;
-            }
-            img {
-          image-rendering: auto;
-          image-rendering: crisp-edges;
-          image-rendering: pixelated;
-          image-rendering: -webkit-optimize-contrast;
+      a {
+        color: black;
+      }
+      a:hover {
+        color: black;
+        text-decoration-line: none;
+      }
+      .ccss {
+        color: blue;
+      }
+      .ccss:hover {
+        text-decoration-line: underline;
+        color: blue;
+      }
+      .abcd {
+        max-width: 100%;
+        min-height: 90%;
+      }
+      body {
+        font:
+          9pt "Segoe UI",
+          "SegoeUI",
+          "Noto Sans",
+          sans-serif;
+      }
+      .inln {
+        max-height: 1%;
+      }
+      .center {
+        margin: 5rem;
       }
     </style>
   </head>
@@ -59,9 +56,7 @@
     <div class="window-body has-space">
       <section class="tabs">
         <menu role="tablist" aria-label="Tabs Template">
-          <button role="tab" aria-controls="tab-A" aria-selected="true">
-            Home
-          </button>
+          <button role="tab" aria-controls="tab-A">Home</button>
           <a href="/projects"
             ><button role="tab" aria-controls="tab-B" href="/projects">
               Projects
@@ -73,7 +68,12 @@
             </button></a
           >
           <a href="/guestbook">
-            <button role="tab" aria-controls="tab-D" href="/guestbook">
+            <button
+              role="tab"
+              aria-controls="tab-D"
+              href="/guestbook"
+              aria-selected="true"
+            >
               Guestbook
             </button></a
           >
@@ -82,33 +82,109 @@
           </button>
         </menu>
       </section>
-      <h2>Here is the progress of the year {{curryear}}, so far:</h2>
-      <div class="progress-indicator segmented">
-        <span class="progress-indicator-bar" style="width: 40%"></span>
-      </div>
-      <div role="progressbar" class="animate">
-        <div style="width: {{year_percentage}}%"></div>
-      </div>
-      <p>
-        My name is Ema, but I go by Huewhg online! I come from the Czech
-        Republic (obligatory Czech flag here:
-        <img
-          class="inln"
-          src="https://blob.gifcities.org/gifcities/2KCNC2FT7VMXIS5KETBIQFA2EEU2L3TN.gif"
-        />)
+      <p>Guestbook!!!</p>
+      <div>
+        <div class="window active" style="max-width: 300px">
+          <div class="title-bar">
+            <div class="title-bar-text">Add to Guestbook!</div>
+            <div class="title-bar-controls">
+              <button aria-label="Minimize"></button>
+              <button aria-label="Maximize"></button>
+              <button aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="window-body has-space">
+            <form action="/guestbook_add" method="post">
+              <label for="name">Name/Nick*:</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                style="margin-right: 3%"
+              />
+              <label for="site">Site/Contact:</label>
+              <input
+                id="site"
+                type="text"
+                name="site"
+                style="margin-right: 3%"
+              />
+              <br />
+              <label for="email">Email:</label>
+              <input
+                id="email"
+                type="text"
+                name="email"
+                style="margin-right: 3%"
+              />
+              <br />
+              <label for="image">Image URL:</label>
+              <input
+                id="image"
+                name="image"
+                type="text"
+                style="margin-right: 3%"
+              />
+              <div class="group" style="width: 200px">
+                <label for="text">Contents*:</label>
+                <textarea id="text" name="text" rows="10"></textarea>
+              </div>
+              <p>Fields marked with * are required</p>
+              <button type="submit" value="Submit">Sign the Guestbook!</button>
+            </form>
+          </div>
+        </div>
         <br />
-        I am a Czech furry thingy, who likes python, c#, and all kinds of
-        hardware shenanigans. I am a avid arch Linux user. <br />
-        Used to use AI often, trying to get rid of it in my life. This website
-        is 100% human written!<br />
-        Feel free to stay a while, explore. This is the very early stages of
-        this site, I'm planning to add a lot of fun stuff, but that's for the
-        future. As customary, this website is under construction.
-      </p>
-
-      <img
-        src="https://blob.gifcities.org/gifcities/7SUEH6FSYMZQ567SCZJS5BTSPTA7UCGU.gif"
-      />
+        <br />
+        {% for s in sigs %}
+        <div
+          class="window active"
+          style="max-width: fit-content"
+          class="center"
+        >
+          <div class="title-bar">
+            <div class="title-bar-text">{{s.name}}</div>
+            <div class="title-bar-controls">
+              <button aria-label="Minimize"></button>
+              <button aria-label="Maximize"></button>
+              <button aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="window-body has-space">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name/Nick</th>
+                  {% if s.site != "" %}
+                  <th>Site/Contact</th>
+                  {% endif %} {% if s.mail != "" %}
+                  <th>Email</th>
+                  {% endif %}
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlighted">
+                  <td>{{s.name}}</td>
+                  {% if s.site != "" %}
+                  <td><a href="https://{{s.site}}">{{s.site }}</a></td>
+                  {% endif %} {% if s.mail != "" %}
+                  <td>{{s.mail}}</td>
+                  {% endif %}
+                </tr>
+              </tbody>
+            </table>
+            <p>{{ s.contents | replace('\n', '<br>') | safe }}</p>
+            {% if s.image != ""%}
+            <img src="{{s.image}}" />
+            {% endif %}
+          </div>
+        </div>
+        <br />
+        <br />
+        {% endfor %}
+      </div>
+    </div>
+    <div>
       <br />
       <img src="http://www.deadnet.se/88x31/2001.gif" />
       <a href="https://github.com/IShouldTestMyCode/hrt-cafe-archive"
@@ -160,7 +236,6 @@
         height="31"
       />
     </div>
-
     <div class="status-bar">
       <p class="status-bar-field">{{curryear}} - Huewhg</p>
       <p class="status-bar-field">{{year}}</p>
