@@ -27,7 +27,7 @@ class signature:
 CPU_INTERVAL = 5
 cwd = Path.cwd()
 print(cwd)
-GUESTBOOK_PATH = str(cwd) + "/disk/guestbook.txt"
+GUESTBOOK_PATH = str(cwd.parent) + "/disk/guestbook.txt"
 app = Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
