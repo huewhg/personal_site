@@ -13,7 +13,7 @@ import psutil
 from datetime import datetime
 import time
 from dataclasses import dataclass
-
+from pathlib import Path
 
 @dataclass
 class signature:
@@ -25,7 +25,9 @@ class signature:
 
 
 CPU_INTERVAL = 5
-GUESTBOOK_PATH = r"./guestbook.txt"
+cwd = Path.cwd()
+print(cwd)
+GUESTBOOK_PATH = str(cwd) + "/disk/guestbook.txt"
 app = Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
@@ -114,7 +116,6 @@ def projects():
     year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
     context = {
         "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
-        "year_percentage": year_percentage,
         "cpu": last_cpu,
         "curryear": datetime.fromtimestamp(last_accessed).year,
     }
@@ -122,7 +123,27 @@ def projects():
         "projects.html",
         **context,
     )
-
+@app.route("/links", methods=["GET"])
+def links():
+    global last_cpu
+    global last_accessed
+    print(time.time() - last_accessed)
+    if time.time() - last_accessed >= CPU_INTERVAL:
+        last_cpu = psutil.cpu_percent(interval=0.5)
+        last_accessed = time.time()
+        print("up")
+    CPU = last_cpu
+    to = datetime.today()
+    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    context = {
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "cpu": last_cpu,
+        "curryear": datetime.fromtimestamp(last_accessed).year,
+    }
+    return render_template(
+        "links.html",
+        **context,
+    )
 
 @app.route("/guestbook", methods=["GET"])
 def guestbook():
