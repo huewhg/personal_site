@@ -77,9 +77,11 @@
               Guestbook
             </button></a
           >
-          <button role="tab" aria-controls="tab-E" disabled>
-            Chatroom (in progress)
-          </button>
+          <a href="/chatroom">
+            <button role="tab" aria-controls="tab-E" href="/guestbook">
+              Chatroom
+            </button></a
+          >
         </menu>
       </section>
       <p>Guestbook!!!</p>
@@ -144,7 +146,7 @@
           class="center"
         >
           <div class="title-bar">
-            <div class="title-bar-text">{{s.name}}  </div>
+            <div class="title-bar-text">{{s.name}}</div>
             <div class="title-bar-controls">
               <button aria-label="Minimize"></button>
               <button aria-label="Maximize"></button>
