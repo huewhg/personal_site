@@ -9,7 +9,7 @@
       type="image/x-icon"
       href="https://files.catbox.moe/fawl7f.ico"
     />
-    <meta http-equiv="refresh" content="5" />
+    <meta http-equiv="refresh" content="30" />
     <!--
     Thanks to 7.css, amazing!
     https://khang-nd.github.io/7.css/
@@ -170,7 +170,7 @@
       </div>
       {% endfor %} {% if has_account %}
       <form action="/chatroom_add" method="post">
-        <input id="mesasge" type="text" style="width: 70%" />
+        <input id="mesasge" name="mesasge" type="text" style="width: 70%" />
         <button type="submit" value="Submit">Send!</button>
       </form>
       {% endif %}

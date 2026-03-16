@@ -58,16 +58,6 @@ print(last_cpu)
 
 chats: list[chat] = []
 users: list[persona] = []
-for i in range(3):
-    hex_color = hex(random.randrange(0, 2**24))
-    std_color = "#" + hex_color[2:]
-    chats.append(
-        chat(
-            i,
-            "Sit ad ut ut esse ut tempor ",
-        )
-    )
-    users.append(persona(f"Test{i}", "https://files.catbox.moe/p4k9iw.png", std_color))
 
 
 def init_guestbook(path: str) -> None:
@@ -191,17 +181,6 @@ def chatroom():
     if len(chats) > MAX_SCROLLBACK:
         chats.remove(chats[0])
     sendchats: list[sendchat] = []
-    hex_color = hex(random.randrange(0, 2**24))
-    std_color = "#" + hex_color[2:]
-    set_persona(
-        users,
-        random.randrange(
-            0,
-            len(chats),
-        ),
-        color=std_color,
-        name=f"Test{random.random()}",
-    )
     for i in chats:
         sendchats.append(sendchat(users[i.uid], i.contents))
 
@@ -215,21 +194,23 @@ def chatroom():
         "persona": persona,
     }
 
-    
     if corrupt_persona:
         resp = redirect("/clear_uid")
     else:
         resp = render_template(
-        "chatroom.html",
-        **context,
-    )
+            "chatroom.html",
+            **context,
+        )
     return resp
+
 
 @app.route("/clear_uid", methods=["GET"])
 def clear_uid():
     resp = redirect("/chatroom")
     resp.set_cookie("uid", "", expires=0)
     return resp
+
+
 @app.route("/projects", methods=["GET"])
 def projects():
     global last_cpu
@@ -358,6 +339,35 @@ def persona_set():
     # chats.append(chat(users.index(per), "this is a test"))
     resp = redirect("/chatroom")
     resp.set_cookie("uid", str(users.index(per)))
+    return resp
+
+
+@app.route("/chatroom_add", methods=["POST"])
+def chatroom_add():
+
+    global chats
+    corrupt_persona = False
+    persona = None
+    if request.cookies:
+        uid = request.cookies.get("uid")
+        try:
+            persona = users[int(uid)]
+        except:
+            print("corrupt!")
+            persona = None
+            corrupt_persona = True
+    if not corrupt_persona:
+        msg = ""
+        print(request.form)
+        try:
+            msg = request.form.get("mesasge", None)
+        except:
+            return redirect("/chatroom")
+        print(msg)
+        chats.append(chat(int(uid), msg))
+    resp = redirect("/chatroom")
+    if corrupt_persona:
+        resp = redirect("/clear_uid")
     return resp
 
 
