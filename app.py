@@ -14,6 +14,8 @@ from datetime import datetime
 import time
 from dataclasses import dataclass
 from pathlib import Path
+import random
+
 
 @dataclass
 class signature:
@@ -24,29 +26,87 @@ class signature:
     image: str = None
 
 
+@dataclass
+class persona:
+    user: str
+    image: str
+    color: str
+
+
+@dataclass
+class chat:
+    uid: int
+    contents: str
+
+
+@dataclass
+class sendchat:
+    user: persona
+    contents: str
+
+
 CPU_INTERVAL = 5
 cwd = Path.cwd()
 print(cwd)
 GUESTBOOK_PATH = str(cwd.parent) + "/disk/guestbook.txt"
+CHATROOM_PATH = str(cwd.parent) + "/disk/chatroom.txt"
+MAX_SCROLLBACK = 30
 app = Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
 print(last_cpu)
 
+chats: list[chat] = []
+users: list[persona] = []
+for i in range(3):
+    hex_color = hex(random.randrange(0, 2**24))
+    std_color = "#" + hex_color[2:]
+    chats.append(
+        chat(
+            i,
+            "Sit ad ut ut esse ut tempor ",
+        )
+    )
+    users.append(persona(f"Test{i}", "https://files.catbox.moe/p4k9iw.png", std_color))
 
-def init_guestbook() -> None:
-    if not os.path.isfile(GUESTBOOK_PATH):
-        file = open(GUESTBOOK_PATH, "w")
+
+def init_guestbook(path: str) -> None:
+    if not os.path.isfile(path):
+        file = open(path, "w")
         file.write("")
         file.close()
-        print("Guestbook created successfully!")
+        print(f"{path} created successfully!")
 
 
-init_guestbook()
+def set_persona(
+    users: list[persona],
+    uid: int,
+    name: str = None,
+    color: str = None,
+    image: str = None,
+) -> None:
+    u = users[uid]
+    if not name:
+        newname = u.user
+    else:
+        newname = name
+    if not color:
+        newcolor = u.color
+    else:
+        newcolor = color
+    if not image:
+        newimage = u.image
+    else:
+        newimage = image
+    users[uid] = persona(newname, newimage, newcolor)
+
+
+init_guestbook(GUESTBOOK_PATH)
+# init_guestbook(CHATROOM_PATH)
 
 
 def get_guestbook() -> list[signature]:
-    init_guestbook()
+    init_guestbook(GUESTBOOK_PATH)
     file = open(GUESTBOOK_PATH, "r")
     sigs: list[signature] = []
     for i in file:
@@ -66,7 +126,7 @@ def get_guestbook() -> list[signature]:
 
 
 def write_guestbook(s: signature) -> None:
-    init_guestbook()
+    init_guestbook(GUESTBOOK_PATH)
     file = open(GUESTBOOK_PATH, "a")
     newconts = s.contents.replace("\n", "_%").replace("\r", "")
 
@@ -87,6 +147,7 @@ def main():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
         print("up")
+
     CPU = last_cpu
     to = datetime.today()
     year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
@@ -102,6 +163,73 @@ def main():
     )
 
 
+@app.route("/chatroom", methods=["GET"])
+def chatroom():
+    corrupt_persona = False
+    has_account = False
+    persona = None
+    if request.cookies:
+        has_account = True
+        uid = request.cookies.get("uid")
+        try:
+            persona = users[int(uid)]
+        except:
+            print("corrupt!")
+            persona = None
+            corrupt_persona = True
+
+    global last_cpu
+    global last_accessed
+    print(time.time() - last_accessed)
+    if time.time() - last_accessed >= CPU_INTERVAL:
+        last_cpu = psutil.cpu_percent(interval=0.5)
+        last_accessed = time.time()
+    print("up")
+    CPU = last_cpu
+    to = datetime.today()
+    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    if len(chats) > MAX_SCROLLBACK:
+        chats.remove(chats[0])
+    sendchats: list[sendchat] = []
+    hex_color = hex(random.randrange(0, 2**24))
+    std_color = "#" + hex_color[2:]
+    set_persona(
+        users,
+        random.randrange(
+            0,
+            len(chats),
+        ),
+        color=std_color,
+        name=f"Test{random.random()}",
+    )
+    for i in chats:
+        sendchats.append(sendchat(users[i.uid], i.contents))
+
+    context = {
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year_percentage": year_percentage,
+        "cpu": last_cpu,
+        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "messages": sendchats,
+        "has_account": has_account,
+        "persona": persona,
+    }
+
+    
+    if corrupt_persona:
+        resp = redirect("/clear_uid")
+    else:
+        resp = render_template(
+        "chatroom.html",
+        **context,
+    )
+    return resp
+
+@app.route("/clear_uid", methods=["GET"])
+def clear_uid():
+    resp = redirect("/chatroom")
+    resp.set_cookie("uid", "", expires=0)
+    return resp
 @app.route("/projects", methods=["GET"])
 def projects():
     global last_cpu
@@ -123,6 +251,8 @@ def projects():
         "projects.html",
         **context,
     )
+
+
 @app.route("/links", methods=["GET"])
 def links():
     global last_cpu
@@ -144,6 +274,7 @@ def links():
         "links.html",
         **context,
     )
+
 
 @app.route("/guestbook", methods=["GET"])
 def guestbook():
@@ -197,6 +328,37 @@ def guestbook_add():
         pass
     write_guestbook(signature(name, contents, site, mail, image))
     return redirect("/guestbook")
+
+
+@app.route("/persona", methods=["POST"])
+def persona_set():
+    global users
+    global chats
+    name = ""
+    color = ""
+    image = ""
+    print(request.form)
+    try:
+        name = request.form.get("name", None)
+    except:
+        return redirect("/chatroom")
+    try:
+        color = request.form.get("color", None)
+        print(color)
+    except:
+        return redirect("/chatroom")
+    try:
+        image = request.form.get("image", None)
+    except:
+        return redirect("/chatroom")
+    if not len(color) == 7 or not color.startswith("#"):
+        return redirect("/chatroom")
+    per = persona(name, image, color)
+    users.append(per)
+    # chats.append(chat(users.index(per), "this is a test"))
+    resp = redirect("/chatroom")
+    resp.set_cookie("uid", str(users.index(per)))
+    return resp
 
 
 if __name__ == "__main__":

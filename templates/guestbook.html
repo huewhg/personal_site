@@ -144,7 +144,7 @@
           class="center"
         >
           <div class="title-bar">
-            <div class="title-bar-text">{{s.name}}</div>
+            <div class="title-bar-text">{{s.name}}  </div>
             <div class="title-bar-controls">
               <button aria-label="Minimize"></button>
               <button aria-label="Maximize"></button>
@@ -169,7 +169,7 @@
                   {% if s.site != "" %}
                   <td><a href="https://{{s.site}}">{{s.site }}</a></td>
                   {% endif %} {% if s.mail != "" %}
-                  <td>{{s.mail}}</td>
+                  <td><a href="mailto:{{s.mail}}">{{s.mail}}</a></td>
                   {% endif %}
                 </tr>
               </tbody>
