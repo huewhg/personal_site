@@ -100,7 +100,7 @@ att: dict[str, set[str]] = {}
 for t in tags:
     att[t] = attrs
 att["a"].discard("rel")
-print(att)
+# print(att)
 
 # print(nh3.ALLOWED_ATTRIBUTES)
 cln = nh3.Cleaner(
@@ -229,7 +229,7 @@ def main():
 
 @app.route("/images", methods=["GET"])
 def img():
-    print(request.headers)
+    # print(request.headers)
     headers = {
         "Connection": "keep-alive",
         "Pragma": "no-cache",
@@ -251,7 +251,7 @@ def img():
 
     r = requests.get(request.args["img"], headers=headers)
     # print(r.content)
-    print(r.status_code)
+    # print(r.status_code)
     if not r.status_code == 200:
         return 404
     return r.content
@@ -298,7 +298,7 @@ def chatroom():
         "messages": sendchats,
         "has_account": has_account,
         "persona": persona,
-        "timeout":timeout
+        "timeout": timeout,
     }
 
     if corrupt_persona:
