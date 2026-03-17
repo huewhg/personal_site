@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import random
 import nh3
-
+import requests
 
 @dataclass
 class signature:
@@ -174,7 +174,7 @@ def get_guestbook() -> list[signature]:
             conts = cln.clean(conts)
         print(stripped)
         sigs.append(
-            signature(stripped[0], conts, stripped[3], stripped[2], stripped[1])
+            signature(stripped[0], conts, stripped[3], stripped[2], f"/images?img={stripped[1]}")
         )
 
     file.close()
@@ -218,6 +218,15 @@ def main():
         "index.html",
         **context,
     )
+
+
+@app.route("/images", methods=["GET"])
+def img():
+    
+    print(request.args["img"])
+    r = requests.get(request.args["img"])
+    print(r.content)
+    return r.content
 
 
 @app.route("/chatroom", methods=["GET"])
