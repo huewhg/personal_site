@@ -263,6 +263,7 @@ def chatroom():
     has_account = False
     persona = None
     if request.cookies:
+        timeout = 20
         has_account = True
         uid = request.cookies.get("uid")
         try:
@@ -271,7 +272,8 @@ def chatroom():
             print("corrupt!")
             persona = None
             corrupt_persona = True
-
+    else:
+        timeout = 60
     global last_cpu
     global last_accessed
     print(time.time() - last_accessed)
@@ -296,6 +298,7 @@ def chatroom():
         "messages": sendchats,
         "has_account": has_account,
         "persona": persona,
+        "timeout":timeout
     }
 
     if corrupt_persona:
