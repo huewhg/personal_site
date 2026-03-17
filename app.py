@@ -222,10 +222,30 @@ def main():
 
 @app.route("/images", methods=["GET"])
 def img():
+    print(request.headers)
+    headers = {
+    "Connection": "keep-alive",
+    "Pragma": "no-cache",
+    "Cache-Control": "no-cache",
+    "Sec-Gpc": "1",
+    "Sec-Ch-Ua-Platform": "\"Linux\"",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "Sec-Ch-Ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\"",
+    "Dnt": "1",
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Accept": "image/jxl,image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-Fetch-Mode": "no-cors",
+    "Sec-Fetch-Dest": "image",
+    "Referer": "http://127.0.0.1:5001/guestbook",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9,cs-CZ;q=0.8,cs;q=0.7"}
     
-    print(request.args["img"])
-    r = requests.get(request.args["img"])
-    print(r.content)
+    r = requests.get(request.args["img"], headers=headers)
+    #print(r.content)
+    print(r.status_code)
+    if not r.status_code == 200:
+        return 404
     return r.content
 
 
