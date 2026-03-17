@@ -182,7 +182,7 @@
               </tbody>
             </table>
             <p>{{ s.contents | replace('\n', '<br />') | safe }}</p>
-            {% if s.image != ""%}
+            {% if s.image != "/images?img=" and s.image%}
             <img style="max-width: 400px" src="{{s.image}}" />
             {% endif %}
           </div>
