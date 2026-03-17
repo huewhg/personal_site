@@ -15,6 +15,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 import random
+import nh3
 
 
 @dataclass
@@ -44,6 +45,70 @@ class sendchat:
     user: persona
     contents: str
 
+
+attrs = {
+    "href",
+    "name",
+    "target",
+    "title",
+    "id",
+    "rel",
+    "width",
+    "height",
+    "direction",
+    "style",
+    "class",
+    "role",
+    "aria-controls",
+}
+tags = {
+    "a",
+    "h1",
+    "h2",
+    "h3",
+    "strong",
+    "em",
+    "p",
+    "ul",
+    "ol",
+    "li",
+    "br",
+    "sub",
+    "sup",
+    "hr",
+    "marquee",
+    "del",
+    "ins",
+    "code",
+    "abbr",
+    "meter",
+    "progress",
+    "img",
+    "details",
+    "summary",
+    "blockquote",
+    "cite",
+    "time",
+    "datalist",
+    "mark",
+    "audio",
+    "video",
+}
+allowed_tags = nh3.ALLOWED_TAGS | tags
+att: dict[str, set[str]] = {}
+for t in tags:
+    att[t] = attrs
+att["a"].discard("rel")
+print(att)
+
+# print(nh3.ALLOWED_ATTRIBUTES)
+cln = nh3.Cleaner(
+    tags=allowed_tags,
+    clean_content_tags={"script"},
+    attributes=att,
+    strip_comments=False,
+    link_rel="noopener noreferrer nofollow",
+)
 
 CPU_INTERVAL = 5
 cwd = Path.cwd()
@@ -104,7 +169,9 @@ def get_guestbook() -> list[signature]:
         stripped = []
         for i in split:
             stripped.append(i.strip("\n").strip())
-        conts = stripped[4].replace("_%", "\n")
+        conts = stripped[4].replace("_%", "<br />")
+        if nh3.is_html(conts):
+            conts = cln.clean(conts)
         print(stripped)
         sigs.append(
             signature(stripped[0], conts, stripped[3], stripped[2], stripped[1])
@@ -307,6 +374,8 @@ def guestbook_add():
         image = request.form.get("image", None)
     except:
         pass
+    if nh3.is_html(contents):
+        cln.clean(contents)
     write_guestbook(signature(name, contents, site, mail, image))
     return redirect("/guestbook")
 
