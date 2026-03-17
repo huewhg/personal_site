@@ -18,6 +18,7 @@ import random
 import nh3
 import requests
 
+
 @dataclass
 class signature:
     name: str
@@ -174,7 +175,13 @@ def get_guestbook() -> list[signature]:
             conts = cln.clean(conts)
         print(stripped)
         sigs.append(
-            signature(stripped[0], conts, stripped[3], stripped[2], f"/images?img={stripped[1]}")
+            signature(
+                stripped[0],
+                conts,
+                stripped[3],
+                stripped[2],
+                f"/images?img={stripped[1]}",
+            )
         )
 
     file.close()
@@ -224,25 +231,26 @@ def main():
 def img():
     print(request.headers)
     headers = {
-    "Connection": "keep-alive",
-    "Pragma": "no-cache",
-    "Cache-Control": "no-cache",
-    "Sec-Gpc": "1",
-    "Sec-Ch-Ua-Platform": "\"Linux\"",
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    "Sec-Ch-Ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\"",
-    "Dnt": "1",
-    "Sec-Ch-Ua-Mobile": "?0",
-    "Accept": "image/jxl,image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-    "Sec-Fetch-Site": "same-origin",
-    "Sec-Fetch-Mode": "no-cors",
-    "Sec-Fetch-Dest": "image",
-    "Referer": "http://127.0.0.1:5001/guestbook",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Accept-Language": "en-US,en;q=0.9,cs-CZ;q=0.8,cs;q=0.7"}
-    
+        "Connection": "keep-alive",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "Sec-Gpc": "1",
+        "Sec-Ch-Ua-Platform": '"Linux"',
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua": '"Not)A;Brand";v="8", "Chromium";v="138"',
+        "Dnt": "1",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Accept": "image/jxl,image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "no-cors",
+        "Sec-Fetch-Dest": "image",
+        "Referer": "http://127.0.0.1:5001/guestbook",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-US,en;q=0.9,cs-CZ;q=0.8,cs;q=0.7",
+    }
+
     r = requests.get(request.args["img"], headers=headers)
-    #print(r.content)
+    # print(r.content)
     print(r.status_code)
     if not r.status_code == 200:
         return 404
@@ -432,7 +440,7 @@ def persona_set():
         return redirect("/chatroom")
     if not len(color) == 7 or not color.startswith("#"):
         return redirect("/chatroom")
-    per = persona(name, image, color)
+    per = persona(name, f"/images?img={image}", color)
     users.append(per)
     # chats.append(chat(users.index(per), "this is a test"))
     resp = redirect("/chatroom")
