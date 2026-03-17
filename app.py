@@ -201,7 +201,9 @@ def write_guestbook(s: signature) -> None:
 
 get_guestbook()
 
-
+@app.route("/.well-known/discord", methods=["GET"])
+def discord():
+    return "dh=54d5e9b2d21831feef81f3a43158e5934bca864b"
 @app.route("/", methods=["GET"])
 def main():
     global last_cpu
