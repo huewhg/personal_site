@@ -4,7 +4,7 @@ import random
 
 def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
     sImg = "base.png"  # source image
-    sFont = "/usr/share/fonts/Adwaita/AdwaitaMono-Regular.ttf"  # font file
+    sFont = "AdwaitaMono-Regular.ttf"  # font file
     sSize = random.randint(28, 32)  # font size
     sColor = (
         random.randint(100, 255),
