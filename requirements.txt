@@ -2,3 +2,4 @@ flask
 psutil
 nh3
 requests
+pillow

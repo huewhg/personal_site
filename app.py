@@ -17,6 +17,12 @@ from pathlib import Path
 import random
 import nh3
 import requests
+from captcha import (
+    read_challenges_from_file,
+    get_challenge_questions,
+    generate_captcha_from_text,
+)
+import io
 
 
 @dataclass
@@ -121,7 +127,9 @@ app = Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
 print(last_cpu)
-
+CHALLENGES_FILE: str = r"challenges.txt"
+Line_Chars = 15
+challenges = read_challenges_from_file(CHALLENGES_FILE)
 chats: list[chat] = []
 users: list[persona] = []
 
@@ -199,11 +207,25 @@ def write_guestbook(s: signature) -> None:
     print(get_guestbook())
 
 
+def get_random_captcha(challenges: dict[str : set[str]], Line_chars: int) -> bytearray:
+    listkeys = get_challenge_questions(challenges)
+    ch = random.choice(listkeys)
+    img2 = generate_captcha_from_text(ch, Line_Chars)
+    img_byte_arr = io.BytesIO()
+    img2.save(img_byte_arr, format="PNG")
+    img_byte_arr = img_byte_arr.getvalue()
+    print(img_byte_arr)
+    return img_byte_arr
+
+
 get_guestbook()
+
 
 @app.route("/.well-known/discord", methods=["GET"])
 def discord():
     return "dh=54d5e9b2d21831feef81f3a43158e5934bca864b"
+
+
 @app.route("/", methods=["GET"])
 def main():
     global last_cpu

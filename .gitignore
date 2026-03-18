@@ -1,4 +1,5 @@
-./env
 guestbook.txt
 /env
-env
+/images
+image.png
+/_pycache_

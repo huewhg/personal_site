@@ -1,0 +1,5 @@
+What is 9 + 10? : 21, 19
+What is nine plus 10? : 21, 19, twenty one, nineteen
+What is the domain of this website? : mesna.cz, personal-site-twcu.onrender.com
+What is the meaning of life, the universe, and everything? : 42, fourty two
+What is the actual name of the webmistress? : Ema, Emma
