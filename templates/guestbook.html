@@ -137,6 +137,24 @@
                 <label for="text">Contents*:</label>
                 <textarea id="text" name="text" rows="10"></textarea>
               </div>
+              <input
+                type="hidden"
+                id="captcha_id"
+                name="captcha_id"
+                value="{{captcha_id}}"
+              />
+              <br />
+              <img src="{{captcha_img}}" style="max-width: 200px" />
+              <br />
+              <label for="captcha"
+                >Captcha Answer (try spamming now, punk!)*:</label
+              >
+              <input
+                id="captcha"
+                name="captcha"
+                type="text"
+                style="margin-right: 3%"
+              />
               <p>Fields marked with * are required</p>
               <button type="submit" value="Submit">Sign the Guestbook!</button>
             </form>

@@ -132,6 +132,8 @@ Line_Chars = 15
 challenges = read_challenges_from_file(CHALLENGES_FILE)
 chats: list[chat] = []
 users: list[persona] = []
+last_captcha = 0
+captchas: dict[int, str] = {}
 
 
 def init_guestbook(path: str) -> None:
@@ -204,10 +206,12 @@ def write_guestbook(s: signature) -> None:
 
     file.write(f"{s.name}|{s.image}|{s.mail}|{s.site}|{newconts}\n")
     file.close()
-    print(get_guestbook())
+    # print(get_guestbook())
 
 
-def get_random_captcha(challenges: dict[str : set[str]], Line_chars: int) -> bytearray:
+def get_random_captcha(
+    challenges: dict[str : set[str]], Line_chars: int
+) -> {bytearray, str}:
     listkeys = get_challenge_questions(challenges)
     ch = random.choice(listkeys)
     img2 = generate_captcha_from_text(ch, Line_Chars)
@@ -215,7 +219,7 @@ def get_random_captcha(challenges: dict[str : set[str]], Line_chars: int) -> byt
     img2.save(img_byte_arr, format="PNG")
     img_byte_arr = img_byte_arr.getvalue()
     print(img_byte_arr)
-    return img_byte_arr
+    return img_byte_arr, ch
 
 
 get_guestbook()
@@ -300,11 +304,11 @@ def chatroom():
         timeout = 60
     global last_cpu
     global last_accessed
-    print(time.time() - last_accessed)
+
     if time.time() - last_accessed >= CPU_INTERVAL:
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
-    print("up")
+        print("up")
     CPU = last_cpu
     to = datetime.today()
     year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
@@ -346,11 +350,9 @@ def clear_uid():
 def projects():
     global last_cpu
     global last_accessed
-    print(time.time() - last_accessed)
     if time.time() - last_accessed >= CPU_INTERVAL:
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
-        print("up")
     CPU = last_cpu
     to = datetime.today()
     year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
@@ -369,11 +371,9 @@ def projects():
 def links():
     global last_cpu
     global last_accessed
-    print(time.time() - last_accessed)
     if time.time() - last_accessed >= CPU_INTERVAL:
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
-        print("up")
     CPU = last_cpu
     to = datetime.today()
     year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
@@ -388,22 +388,39 @@ def links():
     )
 
 
+@app.route("/c", methods=["GET"])
+def c():
+    i = generate_captcha_from_text(captchas[int(request.args["c"])], Line_Chars)
+    img_byte_arr = io.BytesIO()
+    i.save(img_byte_arr, format="PNG")
+    img_byte_arr = img_byte_arr.getvalue()
+    return img_byte_arr
+
+
 @app.route("/guestbook", methods=["GET"])
 def guestbook():
     global last_cpu
     global last_accessed
-    print(time.time() - last_accessed)
+    global last_captcha
+    global captchas
     if time.time() - last_accessed >= CPU_INTERVAL:
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
         print("up")
     CPU = last_cpu
     to = datetime.today()
+    listkeys = get_challenge_questions(challenges)
+    ch = random.choice(listkeys)
+    id = last_captcha
+    last_captcha += 1
+    captchas[id] = ch
     context = {
         "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
         "cpu": last_cpu,
         "curryear": datetime.fromtimestamp(last_accessed).year,
         "sigs": get_guestbook(),
+        "captcha_img": f"/c?c={id}",
+        "captcha_id": str(id),
     }
     return render_template(
         "guestbook.html",
@@ -418,6 +435,7 @@ def guestbook_add():
     site = None
     mail = None
     image = None
+    captcha_id = None
     try:
         name = request.form.get("name", None)
     except:
@@ -425,6 +443,18 @@ def guestbook_add():
     try:
         contents = request.form.get("text", None)
     except:
+        return redirect("/guestbook")
+    try:
+        captcha_id = request.form.get("captcha_id", None)
+        print(challenges[captchas[int(captcha_id)]])
+        if (
+            not request.form.get("captcha", None).lower()
+            in challenges[captchas[int(captcha_id)]]
+        ):
+
+            raise ValueError("Incorrect Captcha!")
+    except Exception as e:
+        print(f"malformed captcha id: {e}")
         return redirect("/guestbook")
     try:
         site = request.form.get("site", None)
