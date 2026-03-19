@@ -6,11 +6,7 @@ def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
     sImg = "base.png"  # source image
     sFont = "AdwaitaMono-Regular.ttf"  # font file
     sSize = random.randint(28, 32)  # font size
-    sColor = (
-        random.randint(200, 255),
-        random.randint(200, 255),
-        random.randint(200, 255),
-    )  # text color
+    sColor = (1, 1, 1)  # text color
     sPos = (random.randint(0, 30), random.randint(0, 30))  # write text at this position
     ind = 0
     nls = 0
@@ -38,12 +34,20 @@ def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
     iFont = ImageFont.truetype(sFont, sSize)
     iDraw.text(sPos, sText, fill=sColor, font=iFont)
     pixels = iOpen.load()
-    for i in range(int((w * h) * (random.randint(5, 30) / 30))):
+    for h in range(height):
+        for w in range(width):
+            if pixels[w, h] == sColor:
+                pixels[w, h] = (
+                    random.randint(50, 255),
+                    random.randint(50, 255),
+                    random.randint(50, 255),
+                )
+    """    for i in range(int((w * h) * (random.randint(5, 30) / 30))):
         pixels[random.randint(0, w), random.randint(0, h)] = (
             random.randint(50, 240),
             random.randint(50, 240),
             random.randint(50, 240),
-        )
+        )"""
     return iOpen
 
 
@@ -67,3 +71,7 @@ def get_challenge_questions(challenges):
         listkeys.append(k)
     return listkeys
 
+
+if __name__ == "__main__":
+    challenges = read_challenges_from_file(r"challenges.txt")
+    generate_captcha_from_text(random.choice(get_challenge_questions(challenges)))
