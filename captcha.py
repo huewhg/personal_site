@@ -7,9 +7,9 @@ def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
     sFont = "AdwaitaMono-Regular.ttf"  # font file
     sSize = random.randint(28, 32)  # font size
     sColor = (
-        random.randint(100, 255),
-        random.randint(100, 255),
-        random.randint(100, 255),
+        random.randint(200, 255),
+        random.randint(200, 255),
+        random.randint(200, 255),
     )  # text color
     sPos = (random.randint(0, 30), random.randint(0, 30))  # write text at this position
     ind = 0
@@ -38,11 +38,11 @@ def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
     iFont = ImageFont.truetype(sFont, sSize)
     iDraw.text(sPos, sText, fill=sColor, font=iFont)
     pixels = iOpen.load()
-    for i in range(int((w * h) * (random.randint(5, 30) / 100))):
+    for i in range(int((w * h) * (random.randint(5, 30) / 30))):
         pixels[random.randint(0, w), random.randint(0, h)] = (
-            random.randint(20, 200),
-            random.randint(20, 200),
-            random.randint(20, 200),
+            random.randint(50, 240),
+            random.randint(50, 240),
+            random.randint(50, 240),
         )
     return iOpen
 

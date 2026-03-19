@@ -446,13 +446,16 @@ def guestbook_add():
         return redirect("/guestbook")
     try:
         captcha_id = request.form.get("captcha_id", None)
+        print(captchas)
         print(challenges[captchas[int(captcha_id)]])
+        
         if (
             not request.form.get("captcha", None).lower()
             in challenges[captchas[int(captcha_id)]]
         ):
 
             raise ValueError("Incorrect Captcha!")
+        challenges.pop(captchas[int(captcha_id)])
     except Exception as e:
         print(f"malformed captcha id: {e}")
         return redirect("/guestbook")
