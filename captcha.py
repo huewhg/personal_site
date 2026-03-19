@@ -30,24 +30,35 @@ def generate_captcha_from_text(input_text: str, Line_Chars: int) -> Image:
                 random.randint(0, 150),
                 random.randint(0, 150),
             )
+
     iDraw = ImageDraw.Draw(iOpen)
     iFont = ImageFont.truetype(sFont, sSize)
-    iDraw.text(sPos, sText, fill=sColor, font=iFont)
+    iDraw.text(sPos, sText, fill=sColor, font=iFont, )
     pixels = iOpen.load()
+    chunk = 0
+    cCol = (
+        random.randint(100, 255),
+        random.randint(100, 255),
+        random.randint(100, 255),
+    )
     for h in range(height):
         for w in range(width):
-            if pixels[w, h] == sColor:
-                pixels[w, h] = (
-                    random.randint(50, 255),
-                    random.randint(50, 255),
-                    random.randint(50, 255),
-                )
-    """    for i in range(int((w * h) * (random.randint(5, 30) / 30))):
+            if is_similar(pixels[w, h], sColor, THRESHOLD):
+                if chunk > 20:
+                    chunk = 0
+                    cCol = (
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                    )
+                pixels[w,h] = cCol
+                chunk += 1  
+    for i in range(int((w * h) * (random.randint(5, 30) / 75))):
         pixels[random.randint(0, w), random.randint(0, h)] = (
-            random.randint(50, 240),
-            random.randint(50, 240),
-            random.randint(50, 240),
-        )"""
+            random.randint(150, 255),
+            random.randint(150, 255),
+            random.randint(150, 255),
+        )
     return iOpen
 
 
@@ -64,6 +75,11 @@ def read_challenges_from_file(CHALLENGES_FILE: str) -> dict[str : set[str]]:
             challenges[question] = answers
     return challenges
 
+def luminance(pixel):
+    return (0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2])
+def is_similar(pixel_a, pixel_b, threshold):
+    return abs(luminance(pixel_a) - luminance(pixel_b)) < threshold
+THRESHOLD = 30
 
 def get_challenge_questions(challenges):
     listkeys = []
