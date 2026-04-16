@@ -420,11 +420,10 @@ def links():
 def c():
     i = generate_captcha_from_text(captchas[int(request.args["c"])], Line_Chars)
     if len(captchas) > 50:
-        min = 100000000
-        for c in captchas.keys():
-            if c < min:
-                min = c
-        challenges.pop(captchas[min])
+        min_id = min(captchas.keys())
+        challenge_key = captchas.pop(min_id, None)
+        if challenge_key is not None:
+            challenges.pop(challenge_key, None)
     print(f"Len: {len(captchas)}")
     img_byte_arr = io.BytesIO()
     i.save(img_byte_arr, format="PNG")

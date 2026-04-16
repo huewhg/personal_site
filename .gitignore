@@ -3,3 +3,7 @@ guestbook.txt
 /images
 image.png
 /_pycache_
+.venv
+.vscode
+disk
+__pycache__
