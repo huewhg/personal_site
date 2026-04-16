@@ -1,32 +1,18 @@
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    jsonify,
-    send_from_directory,
-    url_for,
-    flash,
-)
+import flask
 import os
 import psutil
-from datetime import datetime
+import datetime
 import time
-from dataclasses import dataclass
-from pathlib import Path
+import dataclasses
+import pathlib
 import random
 import nh3
 import requests
-from captcha import (
-    read_challenges_from_file,
-    get_challenge_questions,
-    generate_captcha_from_text,
-)
+import captcha
 import io
-import sys
 
 
-@dataclass
+@dataclasses.dataclass
 class signature:
     name: str
     contents: str
@@ -35,20 +21,20 @@ class signature:
     image: str = None
 
 
-@dataclass
+@dataclasses.dataclass
 class persona:
     user: str
     image: str
     color: str
 
 
-@dataclass
+@dataclasses.dataclass
 class chat:
     uid: int
     contents: str
 
 
-@dataclass
+@dataclasses.dataclass
 class sendchat:
     user: persona
     contents: str
@@ -119,20 +105,22 @@ cln = nh3.Cleaner(
 )
 
 CPU_INTERVAL = 5
-cwd = Path.cwd()
+cwd = pathlib.Path.cwd()
 print(cwd)
 GUESTBOOK_PATH = str(cwd.parent) + "/disk/guestbook.txt"
 CHATROOM_PATH = str(cwd.parent) + "/disk/chatroom.txt"
+if not os.path.exists(str(cwd.parent) + "/disk/"):
+    os.mkdir(str(cwd.parent) + "/disk/")
 UAP_PATH = "static/UAP"
 UAPS: list[str] = []
 MAX_SCROLLBACK = 30
-app = Flask(__name__)
+app = flask.Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
 print(last_cpu)
 CHALLENGES_FILE: str = r"challenges.txt"
 Line_Chars = 15
-challenges = read_challenges_from_file(CHALLENGES_FILE)
+challenges = captcha.read_challenges_from_file(CHALLENGES_FILE)
 chats: list[chat] = []
 users: list[persona] = []
 last_captcha = 0
@@ -220,9 +208,9 @@ def write_guestbook(s: signature) -> None:
 def get_random_captcha(
     challenges: dict[str : set[str]], Line_chars: int
 ) -> {bytearray, str}:
-    listkeys = get_challenge_questions(challenges)
+    listkeys = captcha.get_challenge_questions(challenges)
     ch = random.choice(listkeys)
-    img2 = generate_captcha_from_text(ch, Line_Chars)
+    img2 = captcha.generate_captcha_from_text(ch, Line_Chars)
     img_byte_arr = io.BytesIO()
     img2.save(img_byte_arr, format="PNG")
     img_byte_arr = img_byte_arr.getvalue()
@@ -245,18 +233,19 @@ def main():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
     CPU = last_cpu
-    to = datetime.today()
-    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "year_percentage": year_percentage,
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
     }
-    return render_template(
+    return flask.render_template(
         "index.html",
         **context,
     )
+
 
 @app.route("/maya", methods=["GET"])
 def maya():
@@ -266,18 +255,20 @@ def maya():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
     CPU = last_cpu
-    to = datetime.today()
-    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "year_percentage": year_percentage,
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
     }
-    return render_template(
+    return flask.render_template(
         "maya.html",
         **context,
     )
+
+
 @app.route("/images", methods=["GET"])
 def img():
     headers = {
@@ -298,20 +289,27 @@ def img():
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "en-US,en;q=0.9,cs-CZ;q=0.8,cs;q=0.7",
     }
-    get_random:bool = False
-    path = request.args["img"]
+    get_random: bool = False
+    path = flask.request.args["img"]
+    print(path)
     if path:
-        r = requests.get(path, headers=headers)
-    # print(r.content)
-    # print(r.status_code)
-        if not r.status_code == 200:
+        try:
+            r = requests.get(path, headers=headers)
+            if not r.status_code == 200:
+                get_random = True
+        # print(r.content)
+        # print(r.status_code)
+        except:
             get_random = True
+
     else:
         get_random = True
     if get_random:
         print("No image!")
         with open(random.choice(UAPS), "rb") as file_t:
-            return file_t
+            file = file_t.read()
+            file_t.close()
+        return file
     return r.content
 
 
@@ -320,10 +318,10 @@ def chatroom():
     corrupt_persona = False
     has_account = False
     persona = None
-    if request.cookies:
+    if flask.request.cookies:
         timeout = 20
         has_account = True
-        uid = request.cookies.get("uid")
+        uid = flask.request.cookies.get("uid")
         try:
             persona = users[int(uid)]
         except:
@@ -338,8 +336,8 @@ def chatroom():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
     CPU = last_cpu
-    to = datetime.today()
-    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
     if len(chats) > MAX_SCROLLBACK:
         chats.remove(chats[0])
     sendchats: list[sendchat] = []
@@ -347,10 +345,10 @@ def chatroom():
         sendchats.append(sendchat(users[i.uid], i.contents))
 
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "year_percentage": year_percentage,
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
         "messages": sendchats,
         "has_account": has_account,
         "persona": persona,
@@ -358,9 +356,9 @@ def chatroom():
     }
 
     if corrupt_persona:
-        resp = redirect("/clear_uid")
+        resp = flask.redirect("/clear_uid")
     else:
-        resp = render_template(
+        resp = flask.render_template(
             "chatroom.html",
             **context,
         )
@@ -369,7 +367,7 @@ def chatroom():
 
 @app.route("/clear_uid", methods=["GET"])
 def clear_uid():
-    resp = redirect("/chatroom")
+    resp = flask.redirect("/chatroom")
     resp.set_cookie("uid", "", expires=0)
     return resp
 
@@ -382,14 +380,14 @@ def projects():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
     CPU = last_cpu
-    to = datetime.today()
-    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
     }
-    return render_template(
+    return flask.render_template(
         "projects.html",
         **context,
     )
@@ -403,14 +401,14 @@ def links():
         last_cpu = psutil.cpu_percent(interval=0.5)
         last_accessed = time.time()
     CPU = last_cpu
-    to = datetime.today()
-    year_percentage = datetime.now().timetuple().tm_yday / 365 * 100
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
     }
-    return render_template(
+    return flask.render_template(
         "links.html",
         **context,
     )
@@ -418,7 +416,9 @@ def links():
 
 @app.route("/c", methods=["GET"])
 def c():
-    i = generate_captcha_from_text(captchas[int(request.args["c"])], Line_Chars)
+    i = captcha.generate_captcha_from_text(
+        captchas[int(flask.request.args["c"])], Line_Chars
+    )
     if len(captchas) > 50:
         min = 100000000
         for c in captchas.keys():
@@ -443,21 +443,21 @@ def guestbook():
         last_accessed = time.time()
         print("up")
     CPU = last_cpu
-    to = datetime.today()
-    listkeys = get_challenge_questions(challenges)
+    to = datetime.datetime.today()
+    listkeys = captcha.get_challenge_questions(challenges)
     ch = random.choice(listkeys)
     id = last_captcha
     last_captcha += 1
     captchas[id] = ch
     context = {
-        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.fromtimestamp(last_accessed).time()}.",
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "cpu": last_cpu,
-        "curryear": datetime.fromtimestamp(last_accessed).year,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
         "sigs": get_guestbook(),
         "captcha_img": f"/c?c={id}",
         "captcha_id": str(id),
     }
-    return render_template(
+    return flask.render_template(
         "guestbook.html",
         **context,
     )
@@ -472,18 +472,18 @@ def guestbook_add():
     image = None
     captcha_id = None
     try:
-        name = request.form.get("name", None)
+        name = flask.request.form.get("name", None)
     except:
-        return redirect("/guestbook")
+        return flask.redirect("/guestbook")
     try:
-        contents = request.form.get("text", None)
+        contents = flask.request.form.get("text", None)
     except:
-        return redirect("/guestbook")
+        return flask.redirect("/guestbook")
     try:
-        captcha_id = request.form.get("captcha_id", None)
+        captcha_id = flask.request.form.get("captcha_id", None)
 
         if (
-            not request.form.get("captcha", None).lower()
+            not flask.request.form.get("captcha", None).lower()
             in challenges[captchas[int(captcha_id)]]
         ):
 
@@ -491,23 +491,23 @@ def guestbook_add():
         challenges.pop(captchas[int(captcha_id)])
     except Exception as e:
         print(f"malformed captcha id: {e}")
-        return redirect("/guestbook")
+        return flask.redirect("/guestbook")
     try:
-        site = request.form.get("site", None)
+        site = flask.request.form.get("site", None)
     except:
         pass
     try:
-        mail = request.form.get("email", None)
+        mail = flask.request.form.get("email", None)
     except:
         pass
     try:
-        image = request.form.get("image", None)
+        image = flask.request.form.get("image", None)
     except:
         pass
     if nh3.is_html(contents):
         cln.clean(contents)
     write_guestbook(signature(name, contents, site, mail, image))
-    return redirect("/guestbook")
+    return flask.redirect("/guestbook")
 
 
 @app.route("/persona", methods=["POST"])
@@ -518,23 +518,23 @@ def persona_set():
     color = ""
     image = ""
     try:
-        name = request.form.get("name", None)
+        name = flask.request.form.get("name", None)
     except:
-        return redirect("/chatroom")
+        return flask.redirect("/chatroom")
     try:
-        color = request.form.get("color", None)
+        color = flask.request.form.get("color", None)
     except:
-        return redirect("/chatroom")
+        return flask.redirect("/chatroom")
     try:
-        image = request.form.get("image", None)
+        image = flask.request.form.get("image", None)
     except:
-        return redirect("/chatroom")
+        return flask.redirect("/chatroom")
     if not len(color) == 7 or not color.startswith("#"):
-        return redirect("/chatroom")
-    per = persona(name, f"/images?img={image}", color)
+        return flask.redirect("/chatroom")
+    per = persona(name, image, color)
     users.append(per)
     # chats.append(chat(users.index(per), "this is a test"))
-    resp = redirect("/chatroom")
+    resp = flask.redirect("/chatroom")
     resp.set_cookie("uid", str(users.index(per)))
     return resp
 
@@ -545,8 +545,8 @@ def chatroom_add():
     global chats
     corrupt_persona = False
     persona = None
-    if request.cookies:
-        uid = request.cookies.get("uid")
+    if flask.request.cookies:
+        uid = flask.request.cookies.get("uid")
         try:
             persona = users[int(uid)]
         except:
@@ -555,13 +555,13 @@ def chatroom_add():
     if not corrupt_persona:
         msg = ""
         try:
-            msg = request.form.get("mesasge", None)
+            msg = flask.request.form.get("mesasge", None)
         except:
-            return redirect("/chatroom")
+            return flask.redirect("/chatroom")
         chats.append(chat(int(uid), msg))
-    resp = redirect("/chatroom")
+    resp = flask.redirect("/chatroom")
     if corrupt_persona:
-        resp = redirect("/clear_uid")
+        resp = flask.redirect("/clear_uid")
     return resp
 
 
