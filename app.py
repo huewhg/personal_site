@@ -262,7 +262,7 @@ def discord():
 def before():
     print(flask.request.headers)
     if (
-        flask.request.headers.get("X-Forwarded-For", flask.request.remote_addr)
+        flask.request.headers.get("Cf-Connecting-Ip", flask.request.remote_addr)
         == "37.143.117.214"
     ):
         flask.abort(404)
@@ -272,12 +272,12 @@ def before():
         )
 
 
-@app.route("/test", methods=["GET"])
+"""@app.route("/test", methods=["GET"])
 def test():
     d:list = []
     for i in flask.request.headers:
         d.append(i)
-    return flask.jsonify(d)
+    return flask.jsonify(d)"""
 
 
 @app.route("/", methods=["GET"])
