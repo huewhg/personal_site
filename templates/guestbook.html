@@ -61,10 +61,17 @@
     <div class="window-body has-space">
       <section class="tabs">
         <menu role="tablist" aria-label="Tabs Template">
-          <a href="/"><button role="tab" aria-controls="tab-A">Home</button></a>
+          <button role="tab" aria-controls="tab-A" aria-selected="true">
+            Home
+          </button>
           <a href="/projects"
             ><button role="tab" aria-controls="tab-B" href="/projects">
               Projects
+            </button></a
+          >
+          <a href="/bully"
+            ><button role="tab" aria-controls="tab-B" href="/projects">
+              Deadlines (new!)
             </button></a
           >
           <a href="/links">
@@ -73,12 +80,7 @@
             </button></a
           >
           <a href="/guestbook">
-            <button
-              role="tab"
-              aria-controls="tab-D"
-              href="/guestbook"
-              aria-selected="true"
-            >
+            <button role="tab" aria-controls="tab-D" href="/guestbook">
               Guestbook
             </button></a
           >

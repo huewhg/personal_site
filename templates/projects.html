@@ -58,15 +58,19 @@
     <div class="window-body has-space">
       <section class="tabs">
         <menu role="tablist" aria-label="Tabs Template">
-          <a href="/"><button role="tab" aria-controls="tab-A">Home</button></a>
-          <button
-            role="tab"
-            aria-controls="tab-B"
-            aria-selected="true"
-            href="/projects"
-          >
-            Projects
+          <button role="tab" aria-controls="tab-A" aria-selected="true">
+            Home
           </button>
+          <a href="/projects"
+            ><button role="tab" aria-controls="tab-B" href="/projects">
+              Projects
+            </button></a
+          >
+          <a href="/bully"
+            ><button role="tab" aria-controls="tab-B" href="/projects">
+              Deadlines (new!)
+            </button></a
+          >
           <a href="/links">
             <button role="tab" aria-controls="tab-C" href="/links">
               Links
