@@ -70,7 +70,9 @@ with open("deadlines.txt", "r") as deads:
     for d in l:
         split = d.split("|")
         print(split)
-        deadlines.append(deadline(datetime.datetime.fromtimestamp(float(split[1])), split[0]))
+        deadlines.append(
+            deadline(datetime.datetime.fromtimestamp(float(split[1])), split[0])
+        )
 attrs = {
     "href",
     "name",
@@ -254,6 +256,13 @@ get_guestbook()
 @app.route("/.well-known/discord", methods=["GET"])
 def discord():
     return "dh=fbeb7eb9df795e0918046a4d8102679bce8525cd"
+
+
+@app.before_request
+def before():
+    if flask.request.remote_addr == "10.28.193.132":
+        flask.abort(404)
+        mail.send_email("ILLEGAL ACCESS DETECTED", f"{flask.request.path}\n{datetime.datetime.now()}\n{flask.request.remote_addr}")
 
 
 @app.route("/", methods=["GET"])
