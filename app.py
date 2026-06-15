@@ -261,11 +261,13 @@ def discord():
 @app.before_request
 def before():
     print(flask.request.headers)
-    if flask.request.headers.get("X-Forwarded-For", flask.request.remote_addr) == "10.28.193.132":
+    if flask.request.headers.get("X-Forwarded-For", flask.request.remote_addr) == "37.143.117.214":
         flask.abort(404)
         mail.send_email("ILLEGAL ACCESS DETECTED", f"{flask.request.path}\n{datetime.datetime.now()}\n{flask.request.remote_addr}")
 
-
+@app.route("/test", methods=["GET"])
+def test():
+    return print(flask.request.headers)
 @app.route("/", methods=["GET"])
 def main():
     global last_cpu
