@@ -43,19 +43,17 @@ class sendchat:
 
 @dataclass
 class deadline:
-    """Deadline for end of a thing to track. for /bully endpoint. Renewal time of -1 means it doesn't renew. Renewal time is in seconds"""
+    """Deadline for end of a thing to track. for /bully endpoint."""
 
     end: datetime.datetime
     name: str
-    renewal_time: int = -1
     expired: bool = False
 
     def remaining_time(
         self,
         date: datetime.datetime = datetime.datetime.now(),
-        till_renewal: bool = False,
     ) -> int:
-        """Returns the time in seconds till end of deadline. If till_renewal is true, it gives the time until the next renewal of the deadline. Assumes the date passed is BEFORE the deadline, returns negative if after
+        """Returns the time in seconds till end of deadline. Assumes the date passed is BEFORE the deadline, returns negative if after
 
         Raises:
             Nothing
@@ -63,26 +61,16 @@ class deadline:
         Returns:
             int: Seconds till end
         """
-        if till_renewal and self.renewal_time > 0:
-            return self.end.timestamp() + self.renewal_time - date.timestamp()
         return self.end.timestamp() - date.timestamp()
 
 
 deadlines: list[deadline] = []
-d: deadline = deadline(
-    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 10), "test"
-)
-d2: deadline = deadline(
-    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 5), "test2"
-)
-d3: deadline = deadline(
-    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 1), "test3"
-)
-deadlines.append(d)
-deadlines.append(d2)
-deadlines.append(d3)
-
-print(d.remaining_time())
+with open("deadlines.txt", "r") as deads:
+    l = deads.readlines()
+    for d in l:
+        split = d.split("|")
+        print(split)
+        deadlines.append(deadline(datetime.datetime.fromtimestamp(float(split[1])), split[0]))
 attrs = {
     "href",
     "name",
@@ -319,11 +307,14 @@ def bully():
 @app.route("/send_bully", methods=["POST"])
 def send_bully():
     print(flask.request.form)
-    d:deadline = deadlines[int(flask.request.form.get("task_id", None))]
+    d: deadline = deadlines[int(flask.request.form.get("task_id", None))]
     print(d)
     if d.remaining_time(datetime.datetime.now()) < 0:
         d.expired = True
-        mail.send_email(f"{flask.request.form.get("name", None)} says: {flask.request.form.get("subject", None)}", flask.request.form.get("text",None))
+        mail.send_email(
+            f"{flask.request.form.get("name", None)} says: {flask.request.form.get("subject", None)}",
+            flask.request.form.get("text", None),
+        )
     return flask.redirect("/bully")
 
 
