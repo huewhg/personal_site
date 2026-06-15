@@ -1,14 +1,16 @@
 import smtplib
 from email.mime.text import MIMEText
-
+import pathlib
 subject = "Email Subject"
 body = "This is the body of the text message"
 password = ""
 sender = ""
 recipients = []
-with open("pwd.txt", "r") as p:
+cwd = pathlib.Path.cwd()
+
+with open( str(cwd.parent) + "/disk/pwd.txt", "r") as p:
     password = p.readline()
-with open("mail.txt", "r") as m:
+with open(str(cwd.parent) + "/disk/mail.txt", "r") as m:
     mail = m.readline()
     sender = mail
     recipients.append(sender)
