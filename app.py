@@ -260,7 +260,7 @@ def discord():
 
 @app.before_request
 def before():
-    if flask.request.remote_addr == "10.28.193.132":
+    if flask.request.headers.get("X-Forwarded-For", flask.request.remote_addr) == "10.28.193.132":
         flask.abort(404)
         mail.send_email("ILLEGAL ACCESS DETECTED", f"{flask.request.path}\n{datetime.datetime.now()}\n{flask.request.remote_addr}")
 
