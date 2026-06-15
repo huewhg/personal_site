@@ -267,7 +267,7 @@ def before():
 
 @app.route("/test", methods=["GET"])
 def test():
-    return print(flask.request.headers)
+    return flask.request.headers
 @app.route("/", methods=["GET"])
 def main():
     global last_cpu
