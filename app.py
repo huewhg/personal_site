@@ -274,7 +274,10 @@ def before():
 
 @app.route("/test", methods=["GET"])
 def test():
-    return flask.jsonify(flask.request.headers)
+    d:list = []
+    for i in flask.request.headers:
+        d.append(i)
+    return flask.jsonify(d)
 
 
 @app.route("/", methods=["GET"])
