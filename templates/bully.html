@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/7.css" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://files.catbox.moe/fawl7f.ico"
+    />
+    <!--
+    Thanks to 7.css, amazing!
+    https://khang-nd.github.io/7.css/
+    -->
+    <title>mesna.cz</title>
+    <style>
+            a {
+              color: black;
+            }
+            a:hover {
+              color: black;
+              text-decoration-line: none;
+            }
+            .ccss {
+              color: blue;
+            }
+            .ccss:hover {
+              text-decoration-line: underline;
+              color: blue;
+            }
+            .abcd {
+              max-width: 100%;
+              min-height: 90%;
+            }
+            body {
+              font:
+                9pt "Segoe UI",
+                "SegoeUI",
+                "Noto Sans",
+                sans-serif;
+            }
+            .inln{
+              max-height=1%;
+            }
+            img {
+          image-rendering: auto;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          image-rendering: -webkit-optimize-contrast;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="window active abcd"></div>
+    <div class="title-bar">
+      <div class="title-bar-text">mesna.cz - Internet explorer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Restore"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body has-space">
+      <section class="tabs">
+        <menu role="tablist" aria-label="Tabs Template">
+          <button role="tab" aria-controls="tab-A" aria-selected="true">
+            Home
+          </button>
+          <a href="/projects"
+            ><button role="tab" aria-controls="tab-B" href="/projects">
+              Projects
+            </button></a
+          >
+          <a href="/links">
+            <button role="tab" aria-controls="tab-C" href="/links">
+              Links
+            </button></a
+          >
+          <a href="/guestbook">
+            <button role="tab" aria-controls="tab-D" href="/guestbook">
+              Guestbook
+            </button></a
+          >
+          <a href="/chatroom">
+            <button role="tab" aria-controls="tab-E" href="/guestbook">
+              Chatroom
+            </button></a
+          >
+        </menu>
+      </section>
+        {% for rem in remtimes.keys() %}
+        <div class="window active" style="max-width: 300px; margin-top: 30px; margin-bottom: 30px;">
+          <div class="title-bar">
+            <div class="title-bar-text">{{rem}}</div>
+            <div class="title-bar-controls">
+              <button aria-label="Minimize"></button>
+              <button aria-label="Maximize"></button>
+              <button aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="window-body has-space">
+            <p {% if remtimes[rem] < 0 %} style="color:red" {% endif %} >{{remtimes[rem]}} seconds {% if remtimes[rem] > 0 %} left!{%else%} overdue!{%endif%}</p>
+            {% if remtimes[rem] > 0 %} 
+            <p>STILL WORKING ON IT</p>
+             <div role="progressbar" class="error marquee"></div>
+             {%else%}
+             <p>Aww shucks, didn't get this one in time!</p>
+              <div role="progressbar" class="error">
+                <div style="width: 100%"></div>
+              </div>
+              <p>Send me a message relating to this to <s>bully</s> motivate me to finish the task!</p>
+              <form action="/send_bully" method="POST">
+                <label for="name">Name/Nick*:</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                style="margin-right: 3%"
+              />
+              <br />
+              <label for="name">Subject*:</label>
+               <input
+                id="subject"
+                type="text"
+                name="subject"
+                style="margin-right: 3%"
+              />
+              <br />
+              <div class="group" style="width: 200px">
+                <label for="text">Contents*:</label>
+                <textarea id="text" name="text" rows="10"></textarea>
+              </div>
+               <input
+                type="hidden"
+                id="task_id"
+                name="task_id"
+                value="{{loop.index0}}"
+              />
+              <p>Fields marked with * are required</p>
+              <button type="submit" value="Submit">Send message!</button>
+              </form>
+             {%endif%}
+             
+          </div>
+        </div>
+        
+       
+        {% endfor %}
+
+      <br />
+      <a href="https://github.com/IShouldTestMyCode/hrt-cafe-archive"
+        ><img src="https://88x31.kate.pet/hrtcafe.gif" height="31" /></a
+      ><a href="https://pillowfort.social/posts/1632320"
+        ><img src="https://88x31.kate.pet/flag-demigirl.png" height="31" /></a
+      ><img src="https://88x31.kate.pet/pronouns_sheher.gif" height="31" /><a
+        href="https://otherkin.fandom.com/wiki/Therians"
+        ><img src="https://88x31.kate.pet/therian.png" height="31"
+      /></a>
+      <img src="https://88x31.kate.pet/madeon_linux.gif" height="31" />
+      <a href="https://en.wikipedia.org/wiki/Source_(game_engine)"
+        ><img
+          src="https://88x31.kate.pet/source-poweredby-orange.png"
+          height="31" /></a
+      ><img src="https://88x31.kate.pet/console_wii.png" height="31" /><img
+        src="https://88x31.kate.pet/glados.gif"
+        height="31"
+      /><img src="https://88x31.kate.pet/hl.gif" height="31" /><img
+        src="https://88x31.kate.pet/portal_alt.jpg"
+        height="31"
+      /><a href="https://transistorcafe.net/~voltbun/artwork.html"
+        ><img src="https://88x31.kate.pet/xeniatrans_now.gif" height="31" /></a
+      ><img src="https://88x31.kate.pet/cc-button.gif" height="31" />
+      <img src="https://88x31.kate.pet/transrats.gif" height="31" /><img
+        src="https://88x31.kate.pet/nowar.png"
+        height="31"
+      /><img src="https://88x31.kate.pet/w7-boot.gif" height="31" /><a
+        href="https://yesterweb.org/no-to-web3/"
+        ><img src="https://88x31.kate.pet/noweb3.gif" height="31"
+      /></a>
+      <img src="https://88x31.kate.pet/piracy.png" height="31" /><img
+        src="https://88x31.kate.pet/neko.gif"
+        height="31"
+      /><img
+        src="https://88x31.kate.pet/machine_kills_fascists.jpg"
+        height="31"
+      />
+      <img src="https://88x31.kate.pet/girlsnow.png" height="31" /><img
+        src="https://88x31.kate.pet/gamecube.png"
+        height="31"
+      />
+      <a href="https://88x31.kate.pet/"
+        ><img
+          src="https://88x31.kate.pet/0_88x31.kate.pet.png"
+          height="31" /></a
+      ><img
+        src="https://88x31.kate.pet/8831trans_nyannyanmachine.png"
+        height="31"
+      />
+      <a href="https://maya.nyxi.sk"
+        ><img src="https://maya.nyxi.sk/maya.nyxi.sk.png" height="31"
+      /></a>
+    </div>
+
+    <div class="status-bar">
+      <p class="status-bar-field">{{curryear}} - Huewhg</p>
+      <p class="status-bar-field">{{year}}</p>
+      <p class="status-bar-field">
+        Made with
+        <a class="ccss" href="https://khang-nd.github.io/7.css/">7.css</a>
+      </p>
+      <p class="status-bar-field">
+        CPU Usage: {{cpu}}%
+        <!--<div
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="80"
+        >
+          <div style="width: {{cpu}}%"></div>
+        </div>-->
+      </p>
+    </div>
+  </body>
+</html>

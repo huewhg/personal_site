@@ -7,3 +7,7 @@ image.png
 .vscode
 disk
 __pycache__
+pwd.txt
+mail.txt
+env
+personal_site/env

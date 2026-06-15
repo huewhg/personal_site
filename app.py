@@ -3,16 +3,17 @@ import os
 import psutil
 import datetime
 import time
-import dataclasses
+from dataclasses import dataclass
 import pathlib
 import random
 import nh3
 import requests
 import captcha
 import io
+import mail
 
 
-@dataclasses.dataclass
+@dataclass
 class signature:
     name: str
     contents: str
@@ -21,25 +22,67 @@ class signature:
     image: str = None
 
 
-@dataclasses.dataclass
+@dataclass
 class persona:
     user: str
     image: str
     color: str
 
 
-@dataclasses.dataclass
+@dataclass
 class chat:
     uid: int
     contents: str
 
 
-@dataclasses.dataclass
+@dataclass
 class sendchat:
     user: persona
     contents: str
 
 
+@dataclass
+class deadline:
+    """Deadline for end of a thing to track. for /bully endpoint. Renewal time of -1 means it doesn't renew. Renewal time is in seconds"""
+
+    end: datetime.datetime
+    name: str
+    renewal_time: int = -1
+    expired: bool = False
+
+    def remaining_time(
+        self,
+        date: datetime.datetime = datetime.datetime.now(),
+        till_renewal: bool = False,
+    ) -> int:
+        """Returns the time in seconds till end of deadline. If till_renewal is true, it gives the time until the next renewal of the deadline. Assumes the date passed is BEFORE the deadline, returns negative if after
+
+        Raises:
+            Nothing
+
+        Returns:
+            int: Seconds till end
+        """
+        if till_renewal and self.renewal_time > 0:
+            return self.end.timestamp() + self.renewal_time - date.timestamp()
+        return self.end.timestamp() - date.timestamp()
+
+
+deadlines: list[deadline] = []
+d: deadline = deadline(
+    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 10), "test"
+)
+d2: deadline = deadline(
+    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 5), "test2"
+)
+d3: deadline = deadline(
+    datetime.datetime.now() + datetime.timedelta(0, 3, 0, 0, 1), "test3"
+)
+deadlines.append(d)
+deadlines.append(d2)
+deadlines.append(d3)
+
+print(d.remaining_time())
 attrs = {
     "href",
     "name",
@@ -118,7 +161,7 @@ app = flask.Flask(__name__)
 last_accessed = time.time()
 last_cpu: float = psutil.cpu_percent(interval=0.5)
 print(last_cpu)
-CHALLENGES_FILE: str = r"challenges.txt"
+CHALLENGES_FILE: str = r"./challenges.txt"
 Line_Chars = 15
 challenges = captcha.read_challenges_from_file(CHALLENGES_FILE)
 chats: list[chat] = []
@@ -245,6 +288,43 @@ def main():
         "index.html",
         **context,
     )
+
+
+@app.route("/bully", methods=["GET"])
+def bully():
+    global last_cpu
+    global last_accessed
+    if time.time() - last_accessed >= CPU_INTERVAL:
+        last_cpu = psutil.cpu_percent(interval=0.5)
+        last_accessed = time.time()
+    CPU = last_cpu
+    to = datetime.datetime.today()
+    year_percentage = datetime.datetime.now().timetuple().tm_yday / 365 * 100
+    remtimes: dict = {}
+    for d in deadlines:
+        remtimes[d.name] = d.remaining_time(date=datetime.datetime.now())
+    context = {
+        "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
+        "year_percentage": year_percentage,
+        "cpu": last_cpu,
+        "curryear": datetime.datetime.fromtimestamp(last_accessed).year,
+        "remtimes": remtimes,
+    }
+    return flask.render_template(
+        "bully.html",
+        **context,
+    )
+
+
+@app.route("/send_bully", methods=["POST"])
+def send_bully():
+    print(flask.request.form)
+    d:deadline = deadlines[int(flask.request.form.get("task_id", None))]
+    print(d)
+    if d.remaining_time(datetime.datetime.now()) < 0:
+        d.expired = True
+        mail.send_email(f"{flask.request.form.get("name", None)} says: {flask.request.form.get("subject", None)}", flask.request.form.get("text",None))
+    return flask.redirect("/bully")
 
 
 @app.route("/maya", methods=["GET"])
