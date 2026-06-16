@@ -11,7 +11,7 @@ import requests
 import captcha
 import io
 import mail
-
+import threading
 
 @dataclass
 class signature:
@@ -159,12 +159,28 @@ users: list[persona] = []
 last_captcha = 0
 captchas: dict[int, str] = {}
 signatories: dict[str, float] = {}  # str = ip, float = time of last guestbook addition
+# mail.send_email("Server up and running!", "This is a message to inform you that the server is running!", ['adam.dragon.karasek@gmail.com'])
 for dirpath, dirnames, filenames in os.walk(UAP_PATH):
     UAPS.extend(filenames)
     break
 for i in range(len(UAPS)):
     UAPS[i] = f"{UAP_PATH}/{UAPS[i]}"
 
+def check_deadlines_and_send_emails(delay = 10):
+    """
+    Worker function for checking whether a deadline is over, marking it so, and sending emails notifying so.
+
+    Args:
+        delay (int, optional): Defaults to 120s. Represents the seconds between checking if a deadline is over
+    """
+    global deadlines
+    while True:
+        for d in deadlines:
+            if d.remaining_time(datetime.datetime.now()) < 0 and not d.expired:
+                d.expired = True
+                mail.send_email(f"UH OH! You didn't finish {d.name} in time!", "Prepare for punishment :3!")
+        time.sleep(delay)
+threading.Thread(target=check_deadlines_and_send_emails).start()
 
 def init_guestbook(path: str) -> None:
     if not os.path.isfile(path):
@@ -259,8 +275,9 @@ def discord():
 
 
 @app.before_request
-def before():
-    print(flask.request.headers)
+def before() -> None:
+    """Block certain IPs from acessing content!!"""
+
     if (
         flask.request.headers.get("Cf-Connecting-Ip", flask.request.remote_addr)
         == "37.143.117.214"
@@ -315,6 +332,7 @@ def bully():
     remtimes: dict = {}
     for d in deadlines:
         remtimes[d.name] = d.remaining_time(date=datetime.datetime.now())
+        
     context = {
         "year": f"Today's date is the {to.day}. day of the {to.month}. month of the year {to.year}! Info as of {datetime.datetime.fromtimestamp(last_accessed).time()}.",
         "year_percentage": year_percentage,
@@ -334,7 +352,6 @@ def send_bully():
     d: deadline = deadlines[int(flask.request.form.get("task_id", None))]
     print(d)
     if d.remaining_time(datetime.datetime.now()) < 0:
-        d.expired = True
         mail.send_email(
             f"{flask.request.form.get("name", None)} says: {flask.request.form.get("subject", None)}",
             flask.request.form.get("text", None),
