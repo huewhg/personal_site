@@ -296,7 +296,15 @@ def test():
         d.append(i)
     return flask.jsonify(d)"""
 
-
+@app.route("/orion", methods=["GET"])
+def orion():
+    r = ""
+    num = random.randrange(5_000, 10_999)
+    for i in range(num):
+        r += "!"
+    r+=f"\n(FUCK YOU - SENDS YOU {num} EXCLAMATION MARKS!)"
+    return r
+        
 @app.route("/", methods=["GET"])
 def main():
     global last_cpu
